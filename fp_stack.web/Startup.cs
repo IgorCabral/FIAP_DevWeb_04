@@ -2,6 +2,7 @@
 using fp_stack.core.Services;
 using fp_stack.web.Middlewares;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,10 +26,23 @@ namespace fp_stack.web
             //services.AddScoped
             //services.AddSingleton
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=StackDB;Trusted_Connection=True;ConnectRetryCount=0";
+            var connection = @"Server=localhost;Database=StackDB;Integrated Security=SSPI;ConnectRetryCount=0";
             services.AddDbContext<Context>(options => options.UseSqlServer(connection));
 
+            //services.AddDataProtection()
+            //    .SetApplicationName("minhapp")
+            //    .PersistKeysToFileSystem(new System.IO.DirectoryInfo("C:\teste"));
+
             services.AddMvc();
+
+            services.AddAuthentication("app")
+                .AddCookie("app",
+                    o =>
+                    {
+                        o.LoginPath = "/account/index";
+                        o.AccessDeniedPath = "/account/denied";
+                    }
+                );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +55,9 @@ namespace fp_stack.web
 
             app.UseMeuLog();
             app.UseStaticFiles();
+
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

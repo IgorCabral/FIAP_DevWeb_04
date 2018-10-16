@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using fp_stack.core.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace fp_stack.web.Controllers
 {
+    [Authorize]
     public class PerguntasController : Controller
     {
         private readonly Context _context;
@@ -113,6 +115,7 @@ namespace fp_stack.web.Controllers
         }
 
         // GET: Perguntas/Delete/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
